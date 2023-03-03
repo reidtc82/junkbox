@@ -10,4 +10,3 @@
 # The driver will expose an api to the user that will allow the user to perform matix math operations
 # The user will create matrices and then perform operations on them. The driver will then create jobs
 # and send them to the executors. The driver will then wait for the results and return them to the user.
-

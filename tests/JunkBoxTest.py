@@ -4,6 +4,7 @@
 import pytest
 from junkbox.JunkBox import JunkBox
 
+
 # Test the JunkBox class
 # Test the JunkBox class constructor
 def test_JunkBox_constructor():
@@ -17,6 +18,7 @@ def test_JunkBox_constructor():
     # Test that the data attribute is set correctly
     assert junkbox.data == [[1, 2], [3, 4]]
 
+
 # Test the JunkBox class insert method
 def test_JunkBox_insert():
     # Test that the insert method works correctly
@@ -26,6 +28,7 @@ def test_JunkBox_insert():
     junkbox.insert(0, 0, 5)
     # Test that the data was inserted correctly
     assert junkbox.data == [[5, 2], [3, 4]]
+
 
 # Test the JunkBox class get method
 def test_JunkBox_get():
@@ -37,7 +40,8 @@ def test_JunkBox_get():
     # Test that the data was returned correctly
     assert data == 1
 
-#test the JunkBox class getRow method
+
+# test the JunkBox class getRow method
 def test_JunkBox_get_row():
     # Test that the getRow method works correctly
     # Create a JunkBox object
@@ -48,7 +52,7 @@ def test_JunkBox_get_row():
     assert row == [1, 2]
 
 
-#test the JunkBox class get_column method
+# test the JunkBox class get_column method
 def test_JunkBox_get_column():
     # Test that the get_column method works correctly
     # Create a JunkBox object
@@ -57,6 +61,7 @@ def test_JunkBox_get_column():
     column = junkbox.get_column(0)
     # Test that the column was returned correctly
     assert column == [1, 3]
+
 
 # test remove_row method
 def test_JunkBox_remove_row():
@@ -68,6 +73,7 @@ def test_JunkBox_remove_row():
     # Test that the row was removed correctly
     assert junkbox.data == [[3, 4]]
 
+
 # test remove_column method
 def test_JunkBox_remove_column():
     # Test that the remove_column method works correctly
@@ -78,7 +84,8 @@ def test_JunkBox_remove_column():
     # Test that the column was removed correctly
     assert junkbox.data == [[2], [4]]
 
-#test add_row method
+
+# test add_row method
 def test_JunkBox_add_row():
     # Test that the add_row method works correctly
     # Create a JunkBox object
@@ -88,7 +95,8 @@ def test_JunkBox_add_row():
     # Test that the row was added correctly
     assert junkbox.data == [[1, 2], [3, 4], [5, 6]]
 
-#test add_column method
+
+# test add_column method
 def test_JunkBox_add_column():
     # Test that the add_column method works correctly
     # Create a JunkBox object
@@ -97,3 +105,30 @@ def test_JunkBox_add_column():
     junkbox.add_column([5, 6])
     # Test that the column was added correctly
     assert junkbox.data == [[1, 2, 5], [3, 4, 6]]
+
+
+# test the merge function of the JunkBox class
+# test axis 0
+# create two JunkBox objects and merge them
+def test_JunkBox_merge0():
+    # Test that the merge method works correctly
+    # Create a JunkBox object
+    junkbox1 = JunkBox(2, 2, [[1, 2], [3, 4]])
+    junkbox2 = JunkBox(2, 2, [[5, 6], [7, 8]])
+    # Merge the two JunkBox objects
+    junkbox3 = junkbox1.merge(junkbox2, 0)
+    # Test that the merge was done correctly
+    assert junkbox3.data == [[1, 2], [3, 4], [5, 6], [7, 8]]
+
+
+# test axis 1
+# create two JunkBox objects and merge them
+def test_JunkBox_merge1():
+    # Test that the merge method works correctly
+    # Create a JunkBox object
+    junkbox1 = JunkBox(2, 2, [[1, 2], [3, 4]])
+    junkbox2 = JunkBox(2, 2, [[5, 6], [7, 8]])
+    # Merge the two JunkBox objects
+    junkbox3 = junkbox1.merge(junkbox2, 1)
+    # Test that the merge was done correctly
+    assert junkbox3.data == [[1, 2, 5, 6], [3, 4, 7, 8]]
