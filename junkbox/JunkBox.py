@@ -81,7 +81,7 @@ class JunkBox:
     # function that returns specified row
     # returns a list
     # if the row is out of bounds, raise LocationOutOfBoundsException
-    def get_row(self, row: int) -> list:
+    def get_row(self,row: int) -> list:
         # check that the row is within the bounds of the matrix
         # if not, raise LocationOutOfBoundsException
         if row > self.rows:
@@ -154,6 +154,7 @@ class JunkBox:
         if len(column) != self.rows:
             raise ValueError("The column must be the correct length")
         # add the column to the matrix
+        # enumerate through the columns instead of range(len())
         for i in range(len(column)):
             self.data[i].append(column[i])
         # increment the columns attribute
