@@ -1,0 +1,18 @@
+version = 1
+
+[[analyzers]]
+name = "test-coverage"
+
+[[analyzers]]
+name = "python"
+
+  [analyzers.meta]
+  runtime_version = "3.x.x"
+
+[[transformers]]
+name = "black"
+
+test_patterns = [
+  "tests/**",
+  "test_*.py"
+]
