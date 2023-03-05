@@ -1,7 +1,7 @@
 # Import the necessary modules
 from __future__ import annotations
 
-from exceptions.jb_errors import LocationOutOfBoundsException
+from exceptions.jb_errors import LocationOutOfBoundsException, RowLengthException
 
 
 # JunkBox class for use in junkbox
@@ -51,6 +51,21 @@ class JunkBox:
     def __repr__(self):
         return str(self.data)
 
+    # function to transpose the JunkBox matrix
+    # can be called by JunkBox.T
+    # T is a property of the JunkBox class
+    @property
+    def T(self) -> JunkBox:
+        # create a new JunkBox object with the rows and columns swapped
+        # return the new JunkBox object
+        return JunkBox(self.columns, self.rows, self.get_columns())
+
+    # property shape of JunkBox class
+    # returns a tuple of the rows and columns
+    @property
+    def shape(self) -> tuple:
+        return self.rows, self.columns
+
     def insert(self, row: int, column: int, data) -> None:
         # Insert data into the matrix at the specified row and column
         # check that the row and column are within the bounds of the matrix
@@ -81,7 +96,7 @@ class JunkBox:
     # function that returns specified row
     # returns a list
     # if the row is out of bounds, raise LocationOutOfBoundsException
-    def get_row(self,row: int) -> list:
+    def get_row(self, row: int) -> list:
         # check that the row is within the bounds of the matrix
         # if not, raise LocationOutOfBoundsException
         if row > self.rows:
@@ -155,18 +170,12 @@ class JunkBox:
             raise ValueError("The column must be the correct length")
         # add the column to the matrix
         # enumerate through the columns instead of range(len())
-        for i in range(len(column)):
-            self.data[i].append(column[i])
+        # enumerate column and append column[i] to self.data[i]
+        for i, val in enumerate(column):
+            self.data[i].append(val)
         # increment the columns attribute
         self.columns += 1
 
-    # function to merge this JunkBox to another JunkBox passed as an argument to the function
-    # the function will take the other JunkBox and append it to the end of this JunkBox
-    # it will take an argument axis that will determine whether the other JunkBox will be appended to the end of this JunkBox's rows or columns
-    # if axis is 0, the other JunkBox will be appended to the end of this JunkBox's rows
-    # if axis is 1, the other JunkBox will be appended to the end of this JunkBox's columns
-    # if axis is not 0 or 1, raise ValueError
-    # it should use the functions add_row and add_column to do this
     def merge(self, other: JunkBox, axis: int) -> None:
         # check that the axis is 0 or 1
         # if not, raise ValueError
@@ -189,3 +198,58 @@ class JunkBox:
                 self.add_column(column)
 
         return self
+
+    def split(self, axis: int, index: int) -> tuple:
+        # check that the axis is 0 or 1
+        # if not, raise ValueError
+        if axis != 0 and axis != 1:
+            raise ValueError("The axis must be 0 or 1")
+        # check that the index is within the bounds of the matrix
+        # if not, raise LocationOutOfBoundsException
+        if axis == 0 and index > self.rows:
+            raise LocationOutOfBoundsException(
+                "The specified location is out of bounds"
+            )
+        if axis == 1 and index > self.columns:
+            raise LocationOutOfBoundsException(
+                "The specified location is out of bounds"
+            )
+        # split the JunkBox
+        # create two new JunkBox objects
+        # if axis is 0, split at the row
+        # if axis is 1, split at the column
+        if axis == 0:
+            # create a new JunkBox object with the rows above the index
+            # create a new JunkBox object with the rows below the index
+            # return the two JunkBox objects
+            return JunkBox(index, self.columns, self.data[:index]), JunkBox(
+                self.rows - index, self.columns, self.data[index:]
+            )
+        if axis == 1:
+            # create a new JunkBox object with the columns to the left of the index
+            # create a new JunkBox object with the columns to the right of the index
+            # return the two JunkBox objects
+            return (
+                JunkBox(self.rows, index, [row[:index] for row in self.data]),
+                JunkBox(
+                    self.rows, self.columns - index, [row[index:] for row in self.data]
+                ),
+            )
+
+    # function to insert a row into JunkBox matrix
+    # if the row is longer than the number of columns, raise RowLengthException
+    # function must use the split, merge, and add_row functions
+    def insert_row(self, row: list, index: int) -> None:
+        # check that the row is the correct length
+        # if not, raise ValueError
+        if len(row) != self.columns:
+            raise RowLengthException("The row must be the correct length")
+        # split the JunkBox at the index
+        # merge the JunkBox with the new row
+        # merge the JunkBox with the other JunkBox
+        # use the split, merge, and add_row functions
+        junkbox1, junkbox2 = self.split(0, index)
+        junkbox1.add_row(row)
+        junkbox1.merge(junkbox2, 0)
+        self.data = junkbox1.data
+        self.rows += 1

@@ -132,3 +132,80 @@ def test_JunkBox_merge1():
     junkbox3 = junkbox1.merge(junkbox2, 1)
     # Test that the merge was done correctly
     assert junkbox3.data == [[1, 2, 5, 6], [3, 4, 7, 8]]
+
+
+# test the split function of the JunkBox class
+# test axis 0
+# create a JunkBox object and split it
+def test_JunkBox_split0():
+    # Test that the split method works correctly
+    # Create a JunkBox object
+    junkbox1 = JunkBox(4, 2, [[1, 2], [3, 4], [5, 6], [7, 8]])
+    # Split the JunkBox object
+    junkbox2, junkbox3 = junkbox1.split(axis=0, index=2)
+    # Test that the split was done correctly
+    assert junkbox2.data == [[1, 2], [3, 4]]
+    assert junkbox3.data == [[5, 6], [7, 8]]
+
+
+# test axis 1
+# create a JunkBox object and split it
+def test_JunkBox_split1():
+    # Test that the split method works correctly
+    # Create a JunkBox object
+    junkbox1 = JunkBox(2, 4, [[1, 2, 5, 6], [3, 4, 7, 8]])
+    # Split the JunkBox object
+    junkbox2, junkbox3 = junkbox1.split(axis=1, index=2)
+    # Test that the split was done correctly
+    assert junkbox2.data == [[1, 2], [3, 4]]
+    assert junkbox3.data == [[5, 6], [7, 8]]
+
+
+# test the T property of the JunkBox class
+# create a JunkBox object and transpose it
+def test_JunkBox_T():
+    # Test that the T property works correctly
+    # Create a JunkBox object
+    junkbox1 = JunkBox(2, 2, [[1, 2], [3, 4]])
+    # Transpose the JunkBox object
+    junkbox2 = junkbox1.T
+    # Test that the transpose was done correctly
+    assert junkbox2.data == [[1, 3], [2, 4]]
+
+
+# test JunkBox class __str__ method
+def test_JunkBox_str():
+    # Test that the __str__ method works correctly
+    # Create a JunkBox object
+    junkbox = JunkBox(2, 2, [[1, 2], [3, 4]])
+    # Test that the __str__ method works correctly
+    assert str(junkbox) == "[[1, 2], [3, 4]]"
+
+
+# test junkbox class __repr__ method
+def test_JunkBox_repr():
+    # Test that the __repr__ method works correctly
+    # Create a JunkBox object
+    junkbox = JunkBox(2, 2, [[1, 2], [3, 4]])
+    # Test that the __repr__ method works correctly
+    assert repr(junkbox) == "[[1, 2], [3, 4]]"
+
+
+# test junkbox prperty shape
+def test_JunkBox_shape():
+    # Test that the shape property works correctly
+    # Create a JunkBox object
+    junkbox = JunkBox(2, 2, [[1, 2], [3, 4]])
+    # Test that the shape property works correctly
+    assert junkbox.shape == (2, 2)
+
+
+# test JunkBox insert_row method
+def test_JunkBox_insert_row():
+    # Test that the insert_row method works correctly
+    # Create a JunkBox object
+    junkbox = JunkBox(2, 2, [[1, 2], [3, 4]])
+    # Insert a row into the JunkBox matrix
+    junkbox.insert_row(row=[5, 6], index=1)
+    # Test that the row was inserted correctly
+    assert junkbox.data == [[1, 2], [5, 6], [3, 4]]
