@@ -179,7 +179,7 @@ class JunkBox:
     def merge(self, other: JunkBox, axis: int) -> None:
         # check that the axis is 0 or 1
         # if not, raise ValueError
-        if axis != 0 and axis != 1:
+        if axis not in (0, 1):
             raise ValueError("The axis must be 0 or 1")
         # check that the other JunkBox is the same size as this JunkBox
         # if not, raise ValueError
@@ -202,7 +202,7 @@ class JunkBox:
     def split(self, axis: int, index: int) -> tuple:
         # check that the axis is 0 or 1
         # if not, raise ValueError
-        if axis != 0 and axis != 1:
+        if axis not in (0, 1):
             raise ValueError("The axis must be 0 or 1")
         # check that the index is within the bounds of the matrix
         # if not, raise LocationOutOfBoundsException
