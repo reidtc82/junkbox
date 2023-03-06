@@ -1,7 +1,13 @@
 version = 1
 
+test_patterns = [
+  "tests/**",
+  "test_*.py"
+]
+
 [[analyzers]]
 name = "test-coverage"
+enabled = true
 
 [[analyzers]]
 name = "python"
@@ -11,8 +17,4 @@ name = "python"
 
 [[transformers]]
 name = "black"
-
-test_patterns = [
-  "tests/**",
-  "test_*.py"
-]
+enabled = true
