@@ -236,6 +236,8 @@ class JunkBox:
                 ),
             )
 
+        return None
+
     # function to insert a row into JunkBox matrix
     # if the row is longer than the number of columns, raise RowLengthException
     # function must use the split, merge, and add_row functions
