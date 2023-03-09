@@ -32,38 +32,14 @@ class MathPrimitives:
 
 
 class Math:
-    def dot_product(self):
-        pass
+    # has a junkbox-driver object as a member
+    def __init__(self, driver):
+        self.driver = driver
+        self.primitives = MathPrimitives()
 
-    def cross_product(self, a, b):
-        pass
-
-    def transpose(self, a):
-        pass
-
-    def inverse(self, a):
-        pass
-
-    def determinant(self, a):
-        pass
-
-    def eigenvalues(self, a):
-        pass
-
-    def eigenvectors(self, a):
-        pass
-
-    def rank(self, a):
-        pass
-
-    def trace(self, a):
-        pass
-
-    def norm(self, a):
-        pass
-
-    def solve(self, a, b):
-        pass
-
-    def solve_linear(self, a, b):
+    def add(self, a, b):
+        # split a and b JunkBox objects into granular list of cells
+        # pass the cells to the driver with the add function to be queued for execution
+        # the driver will create jobs and send them to the executors
+        # the driver will then wait for the results and return them to the user
         pass
