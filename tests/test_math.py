@@ -8,6 +8,7 @@
 # test that the math class can be instantiated
 
 import pytest
+from junkbox.JunkBox import JunkBox
 from junkbox.math import MathPrimitives, Math
 
 
@@ -47,7 +48,19 @@ def test_mathprimatives_divide():
     assert mathprimatives.divide()(1, 2) == 0.5
 
 
-# test that the math class can be instantiated
+# test that Math class can be instantiated
 def test_math_instantiation():
-    math = Math(None)
+    math = Math()
     assert math is not None
+
+
+# test that the math class can add two JunkBox objects
+def test_math_add():
+    math = Math()
+    a = JunkBox(2, 2, [[1, 1], [1, 1]])
+    b = JunkBox(2, 2, [[1, 1], [1, 1]])
+    c = math.add(a, b)
+    assert c.get(0, 0) == 2
+    assert c.get(0, 1) == 2
+    assert c.get(1, 0) == 2
+    assert c.get(1, 1) == 2
