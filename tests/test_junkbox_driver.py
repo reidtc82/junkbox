@@ -46,6 +46,13 @@ def test_junkboxpool_map():
         assert result[2].exitcode == 0
 
 
+# test that map is using the JunkBoxPool processes and not making its own
+def test_junkboxpool_map_processes():
+    with JunkBoxPool() as pool:
+        result = pool.map(lambda x: x + 1, [(1,), (2,), (3,)])
+        assert result == pool.processes
+
+
 # test JunkBoxPool join method pauses until all tasks are done
 def test_junkboxpool_join():
     with JunkBoxPool() as pool:
