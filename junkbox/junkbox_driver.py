@@ -44,33 +44,27 @@ class JunkBoxPool:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._state = State.STOPPED
 
-    def apply_async(self, target, args) -> None:
+    def apply_async(self, target, args) -> str:
         if self._state == State.RUNNING:
             process = Process(target=target, args=args)
             self.processes.append(process)
-            process.run()
+            process.start()
+            return process.pid
 
     def map(self, func, args):
         if self._state == State.RUNNING:
-            if len(args) == 1:
-                process = Process(target=func, args=args)
+            for arg in args:
+                process = Process(target=func, args=arg)
                 self.processes.append(process)
                 process.start()
-            else:
-                for arg in args:
-                    process = Process(target=func, args=arg)
-                    self.processes.append(process)
-                    process.start()
-            return self.processes
+                return process.pid
 
     def join(self, timeout=None):
         for process in self.processes:
             process.join(timeout=timeout)
 
-    def get(self, timeout=None):
-        # get the results from the processes
+    def get(self):
         results = []
         for process in self.processes:
             results.append(process)
-        time.sleep(timeout)
         return results
