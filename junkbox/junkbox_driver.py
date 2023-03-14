@@ -23,7 +23,7 @@
 # executors will connect to the driver through a socket and add themselves to the executor list in doing so
 
 from multiprocessing import Process
-import time
+import asyncio
 
 
 class State:
@@ -46,10 +46,15 @@ class JunkBoxPool:
 
     def apply_async(self, target, args) -> str:
         if self._state == State.RUNNING:
-            process = Process(target=target, args=args)
+            result = None
+
+            def internal_target(*args):
+                result = target(*args)
+
+            process = Process(target=internal_target, args=(result, args))
             self.processes.append(process)
             process.start()
-            return process.pid
+            yield result
 
     def map(self, func, args):
         if self._state == State.RUNNING:
@@ -57,7 +62,7 @@ class JunkBoxPool:
                 process = Process(target=func, args=arg)
                 self.processes.append(process)
                 process.start()
-                return process.pid
+                yield process
 
     def join(self, timeout=None):
         for process in self.processes:

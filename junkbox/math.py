@@ -44,32 +44,20 @@ class Math:
         if a.shape != b.shape:
             raise ValueError("JunkBox objects must be the same shape")
         else:
-            results = {}
+            result = JunkBox(a.shape[0], a.shape[1], None)
+
             with JunkBoxPool() as pool:
-                # pass the add function to the driver
-                # use a and b get() methods to get the data
                 for i in range(a.shape[0]):
                     for j in range(a.shape[1]):
-                        # use pool.map to create a job
-                        # pass the add function to the driver
-                        results.update(
+                        result.insert(
+                            i,
+                            j,
                             pool.apply_async(
-                                self.primitives.add(),
-                                (a.get(i, j), b.get(i, j), results),
+                                target=self.primitives.add(),
+                                args=(a.get(i, j), b.get(i, j)),
                             ),
-                            (i, j),
                         )
 
-                # use pool.join() to wait for the results
                 pool.join()
 
-                print(results)
-
-                # create a new JunkBox object to hold the results
-                result = JunkBox(a.shape[0], a.shape[1], None)
-                # add the results to the JunkBox object
-
-                for i in range(a.shape[0]):
-                    for j in range(a.shape[1]):
-                        result.insert(i, j, results.pop(0))
-                return result
+            return result
