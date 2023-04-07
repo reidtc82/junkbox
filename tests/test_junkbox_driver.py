@@ -1,5 +1,5 @@
 import pytest
-from junkbox.junkbox_driver import JunkBoxPool, State
+from src.junkbox_driver import JunkBoxPool, State
 import time
 
 

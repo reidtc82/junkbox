@@ -14,8 +14,8 @@
 # the functions should be returned so that the driver can pass them to the executors
 
 
-from junkbox.JunkBox import JunkBox
-from junkbox.junkbox_driver import JunkBoxPool
+from src.JunkBox import JunkBox
+from src.junkbox_driver import JunkBoxPool
 
 
 class MathPrimitives:

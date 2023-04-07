@@ -8,8 +8,8 @@
 # test that the math class can be instantiated
 
 import pytest
-from junkbox.JunkBox import JunkBox
-from junkbox.math import MathPrimitives, Math
+from src.JunkBox import JunkBox
+from src.utility.math import MathPrimitives, Math
 
 
 # test that the mathprimatives class can be instantiated

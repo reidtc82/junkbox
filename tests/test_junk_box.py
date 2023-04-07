@@ -2,7 +2,7 @@
 # These tests are used to test the JunkBox class
 
 import pytest
-from junkbox.JunkBox import JunkBox
+from src.JunkBox import JunkBox
 
 
 # Test the JunkBox class
