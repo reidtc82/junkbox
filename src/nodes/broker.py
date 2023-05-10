@@ -7,6 +7,7 @@
 # It will remove executors from teh executor registry that have not sent a heartbeat in a while
 
 # imports
+import random
 import threading
 import time
 
@@ -37,6 +38,23 @@ class Broker:
         # wait for the threads to finish
         for thread in self.thread_pool:
             thread.join()
+
+        # create a shared object called executors to store the executors that is accessible from all the threads
+        # this is a dictionary of executors
+        # the key is the executor id
+        # the value is the metadata of the executor:
+        #   - ip address
+        #   - port
+        #   - last heartbeat
+        #   - status
+        #   - number of jobs completed
+        #   - number of jobs failed
+        #   - number of jobs running
+        #   - number of jobs pending
+        #   - number of jobs queued
+        #   - number of jobs total
+
+        self.executors = {}
 
     # function to present the shell for administration
     def shell(self) -> None:
@@ -82,6 +100,7 @@ class Broker:
             print("junkbox> ", end="")
             command = input()
             # if the command is --exit then exit the shell
+            # TODO: Refactor this to a dictionary one day
             if command == "--exit":
                 print("Exiting shell")
                 # broadcast the exit command to the threads
@@ -103,6 +122,7 @@ class Broker:
             # if the command is --executors then list the executors
             elif command == "--executors" or command == "--E":
                 print("Listing executors")
+
             # if the command is --pending then list the pending jobs
             elif command == "--pending" or command == "--P":
                 print("Listing pending jobs")
@@ -115,7 +135,7 @@ class Broker:
                 print("Starting broker")
             # if the command is --stop then stop the broker
             elif command == "--stop":
-                self.status = "stoped"
+                self.status = "stopped"
                 print("Stopping broker")
             # if the command is --resume then resume the broker
             elif command == "--resume":
@@ -144,13 +164,29 @@ class Broker:
                 if did_print == True:
                     did_print = False
                 print("bump bump")
+                # TODO: check the heartbeat of the executors
                 # sleep for 5 seconds
                 time.sleep(5)
 
     def registry_server(self) -> None:
         # listen on a port set in the configuration file for new executors to register through
         # when a new executor registers add it to the executor registry
-        
+        while True:
+            # check for exit broadcast from the shell thread
+            # if the exit broadcast is received then exit the thread
+            if self.status == "running":
+                print("Registry server running")
+                time.sleep(random.randint(1, 5))
+                self.executors[random.randint(1, 100)] = "executor {0}".format(
+                    random.randint(1, 1000000)
+                )
+
+    # function that lists a pretty formatted list of executors
+    def list_executors(self) -> None:
+        print("Listing executors")
+        for executor in self.executors:
+            print(executor)
+
 
 if __name__ == "__main__":
     # initialize the broker in a paused state
