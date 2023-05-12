@@ -15,6 +15,7 @@ import time
 class Broker:
     # class to represent the broker
     status = "paused"
+    executors = {}
 
     def __init__(self) -> None:
         # initialize the broker
@@ -32,7 +33,9 @@ class Broker:
         self.thread_pool = []
         self.thread_pool.append(threading.Thread(target=self.shell))
         self.thread_pool.append(threading.Thread(target=self.heartbeat_monitor))
-        self.thread_pool.append(threading.Thread(target=self.registry_server))
+        self.thread_pool.append(
+            threading.Thread(target=self.registry_server, args=(self.executors,))
+        )
         for thread in self.thread_pool:
             thread.start()
         # wait for the threads to finish
@@ -53,8 +56,6 @@ class Broker:
         #   - number of jobs pending
         #   - number of jobs queued
         #   - number of jobs total
-
-        self.executors = {}
 
     # function to present the shell for administration
     def shell(self) -> None:
@@ -121,8 +122,7 @@ class Broker:
                 print("\t--exit : exit")
             # if the command is --executors then list the executors
             elif command == "--executors" or command == "--E":
-                print("Listing executors")
-
+                self.list_executors()
             # if the command is --pending then list the pending jobs
             elif command == "--pending" or command == "--P":
                 print("Listing pending jobs")
@@ -155,37 +155,47 @@ class Broker:
             if self.status == "exiting":
                 print("Exiting heartbeat monitor")
                 break
-            if self.status == "stoped":
+            if self.status == "stopped":
                 # print "Heartbeat monitor stopped" once and then pass
-                if did_print == False:
+                if did_print is False:
                     print("Heartbeat monitor stopped")
                     did_print = True
             else:
-                if did_print == True:
+                if did_print is True:
                     did_print = False
                 print("bump bump")
                 # TODO: check the heartbeat of the executors
                 # sleep for 5 seconds
                 time.sleep(5)
 
-    def registry_server(self) -> None:
+    def registry_server(self, executors) -> None:
         # listen on a port set in the configuration file for new executors to register through
         # when a new executor registers add it to the executor registry
+        did_print = False
         while True:
             # check for exit broadcast from the shell thread
             # if the exit broadcast is received then exit the thread
             if self.status == "running":
-                print("Registry server running")
-                time.sleep(random.randint(1, 5))
-                self.executors[random.randint(1, 100)] = "executor {0}".format(
+                print("Adding executor")
+                time.sleep(random.randint(1, 10))
+                executors[random.randint(1, 100)] = "executor {0}".format(
                     random.randint(1, 1000000)
                 )
+            if self.status == "exiting":
+                print("Exiting registry server")
+                break
+            if self.status == "stopped":
+                # print "Heartbeat monitor stopped" once and then pass
+                if did_print is False:
+                    print("Registry server stopped")
+                    did_print = True
 
     # function that lists a pretty formatted list of executors
     def list_executors(self) -> None:
         print("Listing executors")
         for executor in self.executors:
             print(executor)
+        print("Done listing executors")
 
 
 if __name__ == "__main__":
