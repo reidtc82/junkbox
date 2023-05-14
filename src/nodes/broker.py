@@ -7,7 +7,7 @@
 # It will remove executors from teh executor registry that have not sent a heartbeat in a while
 
 # imports
-import random
+import socket
 import threading
 import time
 
@@ -16,6 +16,8 @@ class Broker:
     # class to represent the broker
     status = "paused"
     executors = {}
+    REGISTRY_HOST = "127.0.0.1"
+    REGISTRY_PORT = 5000
 
     def __init__(self) -> None:
         # initialize the broker
@@ -171,16 +173,37 @@ class Broker:
     def registry_server(self, executors) -> None:
         # listen on a port set in the configuration file for new executors to register through
         # when a new executor registers add it to the executor registry
+        print("Starting registry server")
         did_print = False
         while True:
             # check for exit broadcast from the shell thread
             # if the exit broadcast is received then exit the thread
             if self.status == "running":
-                print("Adding executor")
-                time.sleep(random.randint(1, 10))
-                executors[random.randint(1, 100)] = "executor {0}".format(
-                    random.randint(1, 1000000)
-                )
+                # open a socket server to listen for new executors
+                # when a new executor registers add it to the executor registry and send it the port for which to send heartbeats
+
+                # create a socket server
+                # bind the socket server to the port
+                # listen for new connections
+                # accept new connections
+                # add the new connection to the executor registry
+                # send the new connection the port for which to send heartbeats
+                # close the connection
+
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.bind((self.REGISTRY_HOST, self.REGISTRY_PORT))
+                    s.listen()
+                    conn, addr = s.accept()
+                    executors.append(addr)
+                    with conn:
+                        print("Connected by", addr)
+
+                        while True:
+                            data = conn.recv(1024)
+                            if not data:
+                                break
+                            conn.sendall(data)
+
             if self.status == "exiting":
                 print("Exiting registry server")
                 break
