@@ -195,16 +195,11 @@ class Broker:
                     s.bind((self.REGISTRY_HOST, self.REGISTRY_PORT))
                     s.listen()
                     conn, addr = s.accept()
-                    
+
                     with conn:
                         print("Connected by", addr)
-                        executors.append(
-                            # calculate a guid for the executor
-                            {
-                                "id": uuid.uuid4().hex,
-                                "address": addr
-                            }
-                        )
+                        # add the new executor into the registry dict
+                        executors[uuid.uuid4().hex] = {"address": addr}
                         while True:
                             data = conn.recv(1024)
                             if not data:
