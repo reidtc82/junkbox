@@ -10,7 +10,8 @@
 import socket
 import threading
 import time
-import uuid
+import selectors
+import types
 
 
 class Broker:
@@ -21,18 +22,8 @@ class Broker:
     REGISTRY_PORT = 5000
 
     def __init__(self) -> None:
-        # initialize the broker
-        # initialize the executor registry
-        # initialize the job registry
-        # initialize the work queue
-        # initialize the heartbeat monitor
-        # initialize the socket server
-        # initialize the shell
-        # create threads for the shell, the heartbeat monitor, and the registry server
-        # start the threads
-        # wait for the threads to finish
+        self.sel = selectors.DefaultSelector()
 
-        # create the thread pool and start the threads
         self.thread_pool = []
         self.thread_pool.append(threading.Thread(target=self.shell))
         self.thread_pool.append(threading.Thread(target=self.heartbeat_monitor))
@@ -59,6 +50,31 @@ class Broker:
         #   - number of jobs pending
         #   - number of jobs queued
         #   - number of jobs total
+
+    def _accept_wrapper(self, sock):
+        conn, addr = sock.accept()  # Should be ready to read
+        print(f"Accepted connection from {addr}")
+        conn.setblocking(False)
+        data = types.SimpleNamespace(addr=addr, inb=b"", outb=b"")
+        events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        self.sel.register(conn, events, data=data)
+
+    def _service_connection(self, key, mask):
+        sock = key.fileobj
+        data = key.data
+        if mask & selectors.EVENT_READ:
+            recv_data = sock.recv(1024)  # Should be ready to read
+            if recv_data:
+                data.outb += recv_data
+            else:
+                print(f"Closing connection to {data.addr}")
+                self.sel.unregister(sock)
+                sock.close()
+        if mask & selectors.EVENT_WRITE:
+            if data.outb:
+                print(f"Echoing {data.outb!r} to {data.addr}")
+                sent = sock.send(data.outb)  # Should be ready to write
+                data.outb = data.outb[sent:]
 
     # function to present the shell for administration
     def shell(self) -> None:
@@ -174,46 +190,55 @@ class Broker:
     def registry_server(self, executors) -> None:
         # listen on a port set in the configuration file for new executors to register through
         # when a new executor registers add it to the executor registry
-        print("Starting registry server")
+
         did_print = False
-        while True:
-            # check for exit broadcast from the shell thread
-            # if the exit broadcast is received then exit the thread
-            if self.status == "running":
-                # open a socket server to listen for new executors
-                # when a new executor registers add it to the executor registry and send it the port for which to send heartbeats
+        did_init = False
+        # check for exit broadcast from the shell thread
+        # if the exit broadcast is received then exit the thread
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # conn, addr = s.accept()
 
-                # create a socket server
-                # bind the socket server to the port
-                # listen for new connections
-                # accept new connections
-                # add the new connection to the executor registry
-                # send the new connection the port for which to send heartbeats
-                # close the connection
+        # with conn:
+        #     print("Connected by", addr)
+        #     # add the new executor into the registry dict
+        #     executors[uuid.uuid4().hex] = {"address": addr}
+        #     while True:
+        #         data = conn.recv(1024)
+        #         if not data:
+        #             break
+        #         conn.sendall(data)
+        try:
+            print("Am I here?")
+            while self.status == "running":
+                if not did_init:
+                    did_init = True
+                    print("Starting registry server")
+                    sock.bind((self.REGISTRY_HOST, self.REGISTRY_PORT))
+                    sock.listen()
 
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                    s.bind((self.REGISTRY_HOST, self.REGISTRY_PORT))
-                    s.listen()
-                    conn, addr = s.accept()
+                    print(f"Listening on {(self.REGISTRY_HOST, self.REGISTRY_PORT)}")
+                    sock.setblocking(False)
+                    self.sel.register(sock, selectors.EVENT_READ, data=None)
 
-                    with conn:
-                        print("Connected by", addr)
-                        # add the new executor into the registry dict
-                        executors[uuid.uuid4().hex] = {"address": addr}
-                        while True:
-                            data = conn.recv(1024)
-                            if not data:
-                                break
-                            conn.sendall(data)
+                events = self.sel.select(timeout=None)
+                for key, mask in events:
+                    if key.data is None:
+                        self._accept_wrapper(key.fileobj)
+                    else:
+                        self._service_connection(key, mask)
 
             if self.status == "exiting":
+                self.sel.close()
                 print("Exiting registry server")
-                break
             if self.status == "stopped":
                 # print "Heartbeat monitor stopped" once and then pass
+                self.sel.close()
+                did_init = False
                 if did_print is False:
                     print("Registry server stopped")
                     did_print = True
+        except KeyboardInterrupt:
+            print("Caught keyboard interrupt, exiting")
 
     # function that lists a pretty formatted list of executors
     def list_executors(self) -> None:
