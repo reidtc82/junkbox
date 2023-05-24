@@ -185,7 +185,7 @@ class Broker:
                 print("bump bump")
                 # TODO: check the heartbeat of the executors
                 # sleep for 5 seconds
-                time.sleep(5)
+                time.sleep(15)
 
     def registry_server(self, executors) -> None:
         # listen on a port set in the configuration file for new executors to register through
@@ -195,7 +195,7 @@ class Broker:
         did_init = False
         # check for exit broadcast from the shell thread
         # if the exit broadcast is received then exit the thread
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         # conn, addr = s.accept()
 
         # with conn:
@@ -207,12 +207,14 @@ class Broker:
         #         if not data:
         #             break
         #         conn.sendall(data)
-        try:
-            print("Am I here?")
-            while self.status == "running":
+
+        while True:
+            print(self.status, end="\r")
+            if self.status == "running":
                 if not did_init:
                     did_init = True
                     print("Starting registry server")
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     sock.bind((self.REGISTRY_HOST, self.REGISTRY_PORT))
                     sock.listen()
 
@@ -220,25 +222,32 @@ class Broker:
                     sock.setblocking(False)
                     self.sel.register(sock, selectors.EVENT_READ, data=None)
 
-                events = self.sel.select(timeout=None)
+                print("Waiting for new connections")
+
+                # when self.status is set to "stopped" the selector will not block
+                # and will return immediately
+                events = self.sel.select()
+
                 for key, mask in events:
+                    print("New connection")
                     if key.data is None:
                         self._accept_wrapper(key.fileobj)
                     else:
                         self._service_connection(key, mask)
 
-            if self.status == "exiting":
-                self.sel.close()
-                print("Exiting registry server")
-            if self.status == "stopped":
-                # print "Heartbeat monitor stopped" once and then pass
-                self.sel.close()
-                did_init = False
+                print("Done waiting for new connections")
+            elif self.status == "stopped":
                 if did_print is False:
                     print("Registry server stopped")
                     did_print = True
-        except KeyboardInterrupt:
-            print("Caught keyboard interrupt, exiting")
+
+                if did_init:
+                    did_init = False
+                    self.sel.close()
+
+            if self.status == "exiting":
+                print("Exiting registry server")
+                break
 
     # function that lists a pretty formatted list of executors
     def list_executors(self) -> None:
