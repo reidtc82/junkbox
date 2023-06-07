@@ -61,5 +61,3 @@ class Math:
                 pool.join()
 
             return result
-        
-
