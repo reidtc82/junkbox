@@ -25,7 +25,7 @@ class MathPrimitives:
     def add(self) -> callable:
         return lambda a, b: a + b
 
-    def subtract(self):
+    def subtract(self) -> callable:
         return lambda a, b: a - b
 
     def multiply(self):
@@ -61,3 +61,5 @@ class Math:
                 pool.join()
 
             return result
+        
+
