@@ -51,6 +51,7 @@ class JunkBoxServer:
             print("Received data:", data)
 
             if not data:
+                print("No data...")
                 break
 
             # Process the data (you can implement your own logic here)
