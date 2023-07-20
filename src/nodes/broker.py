@@ -58,13 +58,8 @@ class JunkBoxServer:
                 print("No data...")
                 break
 
-            # if client_socket.fileno() != -1:
-            #     response = "Hello from the server!"
-            #     client_socket.sendall(response.encode("utf-8"))
-            
             if client_socket.fileno() != -1:
                 time.sleep(random.randint(1, 5))
-                # print("something")
                 response = {"Doing work": random.randint(1, 100)}
                 client_socket.sendall(str(response).encode("utf-8"))
 
