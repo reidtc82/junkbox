@@ -14,17 +14,20 @@ class MySocketClient:
         self.client_socket.connect(self.server_address)
         print("Connected to the server:", self.server_address)
 
-    def send_message(self, message):
+    def request_work(self, inner_cmd) -> dict():
         # Send a message to the server
+        message = "I\'m ready to do some work!"
         self.client_socket.sendall(message.encode("utf-8"))
 
-        if message.lower() == "quit":
+        if inner_cmd.lower() == "quit":
             self.close()
             return
 
         # Receive the response from the server
         response = self.client_socket.recv(1024).decode("utf-8")
         print("Received response:", response)
+        response = eval(response)
+        return response
 
     def close(self):
         if self.client_socket:
@@ -40,11 +43,18 @@ if __name__ == "__main__":
     client.connect()
 
     while True:
-        message = input(
+        command = input(
             'Enter a message to send \
                         to the server (or "quit" to exit): '
         )
-        client.send_message(message)
 
-        if message.lower() == "quit":
+        if command.lower() == "continue":
+            job = client.request_work(command)
+            print(job)
+            for key, value in job.items():
+                for _ in range(value):
+                    print(key)
+
+
+        if command.lower() == "quit":
             break

@@ -1,6 +1,8 @@
+import random
 import socket
 import sys
 import threading
+import time
 
 
 class JunkBoxServer:
@@ -13,6 +15,7 @@ class JunkBoxServer:
         self.port = port
         self.server_socket = None
         self.is_running = False
+        self.clients = dict()
 
     def start(self):
         """Starts the server"""
@@ -45,6 +48,7 @@ class JunkBoxServer:
     def handle_client(self, client_socket, client_address):
         """Handles a client connection"""
         print("Connected to:", client_address)
+        self.clients[client_address] = client_socket
 
         while True:
             data = client_socket.recv(1024).decode("utf-8")
@@ -54,11 +58,15 @@ class JunkBoxServer:
                 print("No data...")
                 break
 
-            # Process the data (you can implement your own logic here)
-
+            # if client_socket.fileno() != -1:
+            #     response = "Hello from the server!"
+            #     client_socket.sendall(response.encode("utf-8"))
+            
             if client_socket.fileno() != -1:
-                response = "Hello from the server!"
-                client_socket.sendall(response.encode("utf-8"))
+                time.sleep(random.randint(1, 5))
+                # print("something")
+                response = {"Doing work": random.randint(1, 100)}
+                client_socket.sendall(str(response).encode("utf-8"))
 
         client_socket.close()
         print("Disconnected from:", client_address)
