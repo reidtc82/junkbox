@@ -60,7 +60,7 @@ class JunkBoxServer:
 
             if client_socket.fileno() != -1:
                 time.sleep(random.randint(1, 5))
-                response = {"Doing work": random.randint(1, 100)}
+                response = {"Doing random work": random.randint(1, 100)}
                 client_socket.sendall(str(response).encode("utf-8"))
 
         client_socket.close()

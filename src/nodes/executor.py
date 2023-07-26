@@ -1,4 +1,5 @@
 import socket
+import sys
 
 
 class MySocketClient:
@@ -16,8 +17,8 @@ class MySocketClient:
 
     def request_work(self, inner_cmd) -> dict():
         # Send a message to the server
-        message = "I\'m ready to do some work!"
-        self.client_socket.sendall(message.encode("utf-8"))
+        message = {"header": "work_request", "body": {}}
+        self.client_socket.sendall(message)
 
         if inner_cmd.lower() == "quit":
             self.close()
@@ -44,17 +45,22 @@ if __name__ == "__main__":
 
     while True:
         command = input(
-            'Enter a message to send \
-                        to the server (or "quit" to exit): '
+            "Enter start to begin requesting work \n" + 'from the server (or "quit" to exit): '
         )
 
-        if command.lower() == "continue":
-            job = client.request_work(command)
-            print(job)
-            for key, value in job.items():
-                for _ in range(value):
-                    print(key)
-
+        if command.lower() == "start":
+            while True:
+                try:
+                    job = client.request_work(command)
+                    print(job)
+                    for key, value in job.items():
+                        for _ in range(value):
+                            print(key)
+                except KeyboardInterrupt:
+                    print("Client shutdown initiated by keyboard interrupt...")
+                    client.close()
+                    sys.exit(1)
 
         if command.lower() == "quit":
-            break
+            client.close()
+            sys.exit(0)
