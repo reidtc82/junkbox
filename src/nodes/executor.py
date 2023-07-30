@@ -45,7 +45,8 @@ if __name__ == "__main__":
 
     while True:
         command = input(
-            "Enter start to begin requesting work \n" + 'from the server (or "quit" to exit): '
+            "Enter start to begin requesting work \n"
+            + 'from the server (or "quit" to exit): '
         )
 
         if command.lower() == "start":
