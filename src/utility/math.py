@@ -33,31 +33,3 @@ class MathPrimitives:
 
     def divide(self):
         return lambda a, b: a / b
-
-
-class Math:
-    # has a junkbox-driver object as a member
-    def __init__(self):
-        self.primitives = MathPrimitives()
-
-    def add(self, a: JunkBox, b: JunkBox) -> JunkBox:
-        if a.shape != b.shape:
-            raise ValueError("JunkBox objects must be the same shape")
-        else:
-            result = JunkBox(a.shape[0], a.shape[1], None)
-
-            with JunkBoxPool() as pool:
-                for i in range(a.shape[0]):
-                    for j in range(a.shape[1]):
-                        result.insert(
-                            i,
-                            j,
-                            pool.apply_async(
-                                target=self.primitives.add(),
-                                args=(a.get(i, j), b.get(i, j)),
-                            ),
-                        )
-
-                pool.join()
-
-            return result
