@@ -1,5 +1,6 @@
 import socket
 import sys
+import dill as pickle
 
 
 class MySocketClient:
@@ -18,16 +19,16 @@ class MySocketClient:
     def request_work(self, inner_cmd) -> dict():
         # Send a message to the server
         message = {"header": "work_request", "body": {}}
-        self.client_socket.sendall(message)
+        self.client_socket.sendall(str(message).encode("utf-8"))
 
         if inner_cmd.lower() == "quit":
             self.close()
             return
 
         # Receive the response from the server
-        response = self.client_socket.recv(1024).decode("utf-8")
-        print("Received response:", response)
-        response = eval(response)
+        response = pickle.loads(self.client_socket.recv(1024))
+        # print("Received response:", response)
+        # response = eval(response)
         return response
 
     def close(self):
@@ -45,17 +46,15 @@ if __name__ == "__main__":
 
     while True:
         command = input(
-            "Enter start to begin requesting work \n" + 'from the server (or "quit" to exit): '
+            "Enter start to begin requesting work \n"
+            + 'from the server (or "quit" to exit): '
         )
 
         if command.lower() == "start":
             while True:
                 try:
                     job = client.request_work(command)
-                    print(job)
-                    for key, value in job.items():
-                        for _ in range(value):
-                            print(key)
+                    print("Executing "+job["operation"].__name__+" on "+str(job["args"]) + "\t\t",job["operation"](*job["args"]))
                 except KeyboardInterrupt:
                     print("Client shutdown initiated by keyboard interrupt...")
                     client.close()

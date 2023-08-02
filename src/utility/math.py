@@ -14,10 +14,6 @@
 # the functions should be returned so that the driver can pass them to the executors
 
 
-from src.JunkBox import JunkBox
-from src.junkbox_driver import JunkBoxPool
-
-
 class MathPrimitives:
     def __init__(self):
         pass

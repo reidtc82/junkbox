@@ -3,6 +3,11 @@ import socket
 import sys
 import threading
 import time
+import dill as pickle
+
+
+def add(a, b):
+    return a + b
 
 
 class JunkBoxServer:
@@ -60,8 +65,11 @@ class JunkBoxServer:
 
             if client_socket.fileno() != -1:
                 time.sleep(random.randint(1, 5))
-                response = {"header":{}, "body":{"operation": , "data":[1,2,3,4,5]}}
-                client_socket.sendall(str(response).encode("utf-8"))
+                response = {
+                    "operation": add,
+                    "args": [random.randint(1, 10), random.randint(1, 10)],
+                }
+                client_socket.sendall(pickle.dumps(response))
 
         client_socket.close()
         print("Disconnected from:", client_address)
