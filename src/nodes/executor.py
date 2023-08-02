@@ -36,7 +36,7 @@ class MySocketClient:
             # Close the connection with the server
             self.client_socket.close()
             self.client_socket = None
-            print("Connection closed. to the banana server")
+            print("Connection closed.")
 
 
 if __name__ == "__main__":
