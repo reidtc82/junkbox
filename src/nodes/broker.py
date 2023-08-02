@@ -4,10 +4,10 @@ import sys
 import threading
 import time
 import dill as pickle
+from src.utility.math import MathPrimitives
 
-
-def add(a, b):
-    return a + b
+# def add(a, b):
+#     return a + b
 
 
 class JunkBoxServer:
@@ -21,6 +21,7 @@ class JunkBoxServer:
         self.server_socket = None
         self.is_running = False
         self.clients = dict()
+        self.math_prims = MathPrimitives()
 
     def start(self):
         """Starts the server"""
@@ -66,7 +67,7 @@ class JunkBoxServer:
             if client_socket.fileno() != -1:
                 time.sleep(random.randint(1, 5))
                 response = {
-                    "operation": add,
+                    "operation": self.math_prims.add(),
                     "args": [random.randint(1, 10), random.randint(1, 10)],
                 }
                 client_socket.sendall(pickle.dumps(response))
