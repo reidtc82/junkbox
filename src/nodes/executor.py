@@ -54,7 +54,14 @@ if __name__ == "__main__":
             while True:
                 try:
                     job = client.request_work(command)
-                    print("Executing "+job["operation"].__name__+" on "+str(job["args"]) + "\t\t",job["operation"](*job["args"]))
+                    print(
+                        "Executing "
+                        + job["operation"].__name__
+                        + " on "
+                        + str(job["args"])
+                        + "\t\t",
+                        job["operation"](*job["args"]),
+                    )
                 except KeyboardInterrupt:
                     print("Client shutdown initiated by keyboard interrupt...")
                     client.close()
