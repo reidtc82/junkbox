@@ -21,7 +21,7 @@ class JunkBoxServer:
         self.server_socket = None
         self.is_running = False
         self.clients = dict()
-        self.math_prims = MathPrimitives()
+        self.math_primatives = MathPrimitives()
 
     def start(self):
         """Starts the server"""
@@ -67,7 +67,7 @@ class JunkBoxServer:
             if client_socket.fileno() != -1:
                 time.sleep(random.randint(1, 5))
                 response = {
-                    "operation": self.math_prims.add(),
+                    "operation": self.math_primatives.add(),
                     "args": [random.randint(1, 10), random.randint(1, 10)],
                 }
                 client_socket.sendall(pickle.dumps(response))

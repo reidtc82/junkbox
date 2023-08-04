@@ -24,8 +24,8 @@ class MathPrimitives:
     def subtract(self) -> callable:
         return lambda a, b: a - b
 
-    def multiply(self):
+    def multiply(self) -> callable:
         return lambda a, b: a * b
 
-    def divide(self):
+    def divide(self) -> callable:
         return lambda a, b: a / b
