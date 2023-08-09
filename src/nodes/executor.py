@@ -37,7 +37,7 @@ class MySocketClient:
         self.client_socket.sendall(pickle.dumps(message))
 
         # Receive the response from the server
-        response = self.client_socket.recv(1024)
+        response = pickle.loads(self.client_socket.recv(1024))
         print("Received response:", response)
 
     def close(self):

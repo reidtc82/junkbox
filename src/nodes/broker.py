@@ -68,13 +68,14 @@ class JunkBoxServer:
                 if data['header'] == "work_request":
                     time.sleep(random.randint(1, 5))
                     response = {
+                        "header": "job",
                         "operation": self.math_primatives.add(),
                         "args": [random.randint(1, 10), random.randint(1, 10)],
                     }
                     
                 elif data['header'] == "work_return":
                     print("Received result:", data["body"])
-                    response = {"Result received."}
+                    response = {"header": "message", "text": "Result received."}
 
                 client_socket.sendall(pickle.dumps(response))
 
