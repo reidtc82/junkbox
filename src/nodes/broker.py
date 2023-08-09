@@ -57,19 +57,25 @@ class JunkBoxServer:
         self.clients[client_address] = client_socket
 
         while True:
-            data = client_socket.recv(1024).decode("utf-8")
-            print("Received data:", data)
+            data = client_socket.recv(1024)
+            data = pickle.loads(data)
 
             if not data:
                 print("No data...")
                 break
 
-            if client_socket.fileno() != -1:
-                time.sleep(random.randint(1, 5))
-                response = {
-                    "operation": self.math_primatives.add(),
-                    "args": [random.randint(1, 10), random.randint(1, 10)],
-                }
+            if client_socket.fileno() != -1: # -1 means an error occurred
+                if data['header'] == "work_request":
+                    time.sleep(random.randint(1, 5))
+                    response = {
+                        "operation": self.math_primatives.add(),
+                        "args": [random.randint(1, 10), random.randint(1, 10)],
+                    }
+                    
+                elif data['header'] == "work_return":
+                    print("Received result:", data["body"])
+                    response = {"Result received."}
+
                 client_socket.sendall(pickle.dumps(response))
 
         client_socket.close()

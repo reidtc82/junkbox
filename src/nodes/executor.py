@@ -19,7 +19,7 @@ class MySocketClient:
     def request_work(self, inner_cmd) -> dict():
         # Send a message to the server
         message = {"header": "work_request", "body": {}}
-        self.client_socket.sendall(str(message).encode("utf-8"))
+        self.client_socket.sendall(pickle.dumps(message))
 
         if inner_cmd.lower() == "quit":
             self.close()
@@ -30,6 +30,15 @@ class MySocketClient:
         # print("Received response:", response)
         # response = eval(response)
         return response
+
+    def return_work(self, res):
+        # Send a message to the server
+        message = {"header": "work_return", "body": res}
+        self.client_socket.sendall(pickle.dumps(message))
+
+        # Receive the response from the server
+        response = self.client_socket.recv(1024)
+        print("Received response:", response)
 
     def close(self):
         if self.client_socket:
@@ -54,7 +63,9 @@ if __name__ == "__main__":
             while True:
                 try:
                     job = client.request_work(command)
-                    print("Executing "+job["operation"].__name__+" on "+str(job["args"]) + "\t\t",job["operation"](*job["args"]))
+                    result = job["operation"](*job["args"])
+                    print("Executing "+job["operation"].__name__+" on "+str(job["args"]) + "\t\t",result)
+                    client.return_work(result)
                 except KeyboardInterrupt:
                     print("Client shutdown initiated by keyboard interrupt...")
                     client.close()
