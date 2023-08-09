@@ -64,16 +64,16 @@ class JunkBoxServer:
                 print("No data...")
                 break
 
-            if client_socket.fileno() != -1: # -1 means an error occurred
-                if data['header'] == "work_request":
+            if client_socket.fileno() != -1:  # -1 means an error occurred
+                if data["header"] == "work_request":
                     time.sleep(random.randint(1, 5))
                     response = {
                         "header": "job",
                         "operation": self.math_primatives.add(),
                         "args": [random.randint(1, 10), random.randint(1, 10)],
                     }
-                    
-                elif data['header'] == "work_return":
+
+                elif data["header"] == "work_return":
                     print("Received result:", data["body"])
                     response = {"header": "message", "text": "Result received."}
 

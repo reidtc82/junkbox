@@ -64,7 +64,14 @@ if __name__ == "__main__":
                 try:
                     job = client.request_work(command)
                     result = job["operation"](*job["args"])
-                    print("Executing "+job["operation"].__name__+" on "+str(job["args"]) + "\t\t",result)
+                    print(
+                        "Executing "
+                        + job["operation"].__name__
+                        + " on "
+                        + str(job["args"])
+                        + "\t\t",
+                        result,
+                    )
                     client.return_work(result)
                 except KeyboardInterrupt:
                     print("Client shutdown initiated by keyboard interrupt...")
