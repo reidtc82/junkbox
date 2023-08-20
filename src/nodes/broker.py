@@ -3,11 +3,11 @@ import socket
 import sys
 import threading
 import time
-import dill as pickle
-from src.utility.math import MathPrimitives
 
-# def add(a, b):
-#     return a + b
+import dill as pickle
+
+from src.utility.junk import Job, WorkRequest, WorkReturn
+from src.utility.math import MathPrimitives
 
 
 class JunkBoxServer:
@@ -65,16 +65,16 @@ class JunkBoxServer:
                 print("No data...")
                 break
 
-            if client_socket.fileno() != -1: # -1 means an error occurred
-                if data['header'] == "work_request":
+            if client_socket.fileno() != -1:  # -1 means an error occurred
+                if data["header"] == "work_request":
                     time.sleep(random.randint(1, 5))
                     response = {
                         "header": "job",
                         "operation": self.math_primatives.add(),
                         "args": [random.randint(1, 10), random.randint(1, 10)],
                     }
-                    
-                elif data['header'] == "work_return":
+
+                elif data["header"] == "work_return":
                     print("Received result:", data["body"])
                     response = {"header": "message", "text": "Result received."}
 
@@ -91,9 +91,44 @@ class JunkBoxServer:
             self.server_socket = None
             print("Server stopped.")
 
+    def set_job(self, job: Job):
+        self.jobs.append(job)
+
+    def set_jobs(self, jobs: list):
+        for job in jobs:
+            try:
+                self.set_job(job)
+            except (
+                Exception
+            ) as exception:  # TODO: Add specific exception for if a Job is not passed
+                print("An error occurred:", str(exception))
+                self.stop()
+                sys.exit(1)
+
 
 if __name__ == "__main__":
+    maths = MathPrimitives()
     server = JunkBoxServer("localhost", 8000)
+    server.set_jobs(
+        [
+            Job(
+                operation=maths.add(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+            Job(
+                operation=maths.subtract(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+            Job(
+                operation=maths.multiply(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+            Job(
+                operation=maths.divide(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+        ]
+    )
     server.start()
 
 # To stop the server (you can call this from another part of your code)
