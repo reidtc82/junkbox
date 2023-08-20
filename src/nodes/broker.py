@@ -22,6 +22,7 @@ class JunkBoxServer:
         self.is_running = False
         self.clients = dict()
         self.math_primatives = MathPrimitives()
+        self.jobs = []
 
     def start(self):
         """Starts the server"""
