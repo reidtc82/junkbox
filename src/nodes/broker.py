@@ -3,6 +3,7 @@ import socket
 import sys
 import threading
 import time
+import json
 
 import dill as pickle
 
@@ -67,12 +68,12 @@ class JunkBoxServer:
 
             if client_socket.fileno() != -1:  # -1 means an error occurred
                 if data["header"] == "work_request":
+                    while len(self.jobs) == 0:
+                        print("No jobs...")
+                        time.sleep(1)
+
                     time.sleep(random.randint(1, 5))
-                    response = {
-                        "header": "job",
-                        "operation": self.math_primatives.add(),
-                        "args": [random.randint(1, 10), random.randint(1, 10)],
-                    }
+                    response = self.pop_job().to_dict()
 
                 elif data["header"] == "work_return":
                     print("Received result:", data["body"])
@@ -92,6 +93,7 @@ class JunkBoxServer:
             print("Server stopped.")
 
     def set_job(self, job: Job):
+        print("Adding job:", job)
         self.jobs.append(job)
 
     def set_jobs(self, jobs: list):
@@ -104,6 +106,9 @@ class JunkBoxServer:
                 print("An error occurred:", str(exception))
                 self.stop()
                 sys.exit(1)
+
+    def pop_job(self):
+        return self.jobs.pop()
 
 
 if __name__ == "__main__":
@@ -130,6 +135,7 @@ if __name__ == "__main__":
         ]
     )
     server.start()
+    
 
 # To stop the server (you can call this from another part of your code)
 # server.stop()
