@@ -32,13 +32,10 @@ class JunkBoxServer:
 
     def start(self):
         """Starts the server"""
-        self.processes.append(
-            Process(target=self._start, args=())
-        )
+        self.processes.append(Process(target=self._start, args=()))
 
         for p in self.processes:
             p.start()
-
 
     def _start(self):
         """Starts the server"""
@@ -85,7 +82,6 @@ class JunkBoxServer:
 
             if client_socket.fileno() != -1:  # -1 means an error occurred
                 if data["header"] == "work_request":
-                    print(self.jobs)
                     while self.jobs.empty():
                         print("No jobs...")
                         time.sleep(1)
@@ -95,7 +91,9 @@ class JunkBoxServer:
 
                 elif data["header"] == "work_return":
                     print("Received result:", data["body"])
-                    response = pickle.dumps({"header": "message", "text": "Result received."})
+                    response = pickle.dumps(
+                        {"header": "message", "text": "Result received."}
+                    )
 
                 client_socket.sendall(response)
 
@@ -109,7 +107,7 @@ class JunkBoxServer:
             self.server_socket.close()
             self.server_socket = None
             print("Server stopped.")
-        
+
         for p in self.processes:
             p.join()
 
@@ -156,28 +154,29 @@ if __name__ == "__main__":
         ]
     )
     server.start()
-    time.sleep(60)
-    server.set_jobs(
-        [
-            Job(
-                operation=maths.add(),
-                args=[random.randint(1, 10), random.randint(1, 10)],
-            ),
-            Job(
-                operation=maths.subtract(),
-                args=[random.randint(1, 10), random.randint(1, 10)],
-            ),
-            Job(
-                operation=maths.multiply(),
-                args=[random.randint(1, 10), random.randint(1, 10)],
-            ),
-            Job(
-                operation=maths.divide(),
-                args=[random.randint(1, 10), random.randint(1, 10)],
-            ),
-        ]
-    )
-    
+    while True:
+        time.sleep(random.randint(10, 30))
+        server.set_jobs(
+            [
+                Job(
+                    operation=maths.add(),
+                    args=[random.randint(1, 10), random.randint(1, 10)],
+                ),
+                Job(
+                    operation=maths.subtract(),
+                    args=[random.randint(1, 10), random.randint(1, 10)],
+                ),
+                Job(
+                    operation=maths.multiply(),
+                    args=[random.randint(1, 10), random.randint(1, 10)],
+                ),
+                Job(
+                    operation=maths.divide(),
+                    args=[random.randint(1, 10), random.randint(1, 10)],
+                ),
+            ]
+        )
+
 
 # To stop the server (you can call this from another part of your code)
 # server.stop()
