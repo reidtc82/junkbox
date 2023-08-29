@@ -27,10 +27,20 @@ class JunkBoxServer:
         self.is_running = False
         self.clients = dict()
         self.math_primatives = MathPrimitives()
-        self.jobs = []
-
+        self.jobs = Queue()
+        self.processes = []
 
     def start(self):
+        """Starts the server"""
+        self.processes.append(
+            Process(target=self._start, args=())
+        )
+
+        for p in self.processes:
+            p.start()
+
+
+    def _start(self):
         """Starts the server"""
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -75,19 +85,19 @@ class JunkBoxServer:
 
             if client_socket.fileno() != -1:  # -1 means an error occurred
                 if data["header"] == "work_request":
-
-                    while len(self.jobs) == 0:
+                    print(self.jobs)
+                    while self.jobs.empty():
                         print("No jobs...")
                         time.sleep(1)
 
                     time.sleep(random.randint(1, 5))
-                    response = self.pop_job().to_dict()
+                    response = self.pop_job()
 
                 elif data["header"] == "work_return":
                     print("Received result:", data["body"])
-                    response = {"header": "message", "text": "Result received."}
+                    response = pickle.dumps({"header": "message", "text": "Result received."})
 
-                client_socket.sendall(pickle.dumps(response))
+                client_socket.sendall(response)
 
         client_socket.close()
         print("Disconnected from:", client_address)
@@ -99,10 +109,13 @@ class JunkBoxServer:
             self.server_socket.close()
             self.server_socket = None
             print("Server stopped.")
+        
+        for p in self.processes:
+            p.join()
 
     def set_job(self, job: Job):
         print("Adding job:", job)
-        self.jobs.append(job)
+        self.jobs.put(pickle.dumps(job.to_dict()))
 
     def set_jobs(self, jobs: list):
         for job in jobs:
@@ -116,7 +129,7 @@ class JunkBoxServer:
                 sys.exit(1)
 
     def pop_job(self):
-        return self.jobs.pop()
+        return self.jobs.get()
 
 
 if __name__ == "__main__":
@@ -143,7 +156,28 @@ if __name__ == "__main__":
         ]
     )
     server.start()
-
+    time.sleep(60)
+    server.set_jobs(
+        [
+            Job(
+                operation=maths.add(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+            Job(
+                operation=maths.subtract(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+            Job(
+                operation=maths.multiply(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+            Job(
+                operation=maths.divide(),
+                args=[random.randint(1, 10), random.randint(1, 10)],
+            ),
+        ]
+    )
+    
 
 # To stop the server (you can call this from another part of your code)
 # server.stop()
