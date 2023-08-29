@@ -29,7 +29,6 @@ class JunkBoxServer:
         self.math_primatives = MathPrimitives()
         self.jobs = []
 
-
     def start(self):
         """Starts the server"""
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -75,7 +74,6 @@ class JunkBoxServer:
 
             if client_socket.fileno() != -1:  # -1 means an error occurred
                 if data["header"] == "work_request":
-
                     while len(self.jobs) == 0:
                         print("No jobs...")
                         time.sleep(1)
