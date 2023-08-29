@@ -21,7 +21,6 @@ class JunkBoxServer:
     """A simple TCP server that listens for incoming connections and
     sends a response back to the client.
     """
-
     def __init__(self, host, port):
         self.host = host
         self.port = port
