@@ -5,6 +5,7 @@ import threading
 import time
 import dill as pickle
 from src.utility.math import MathPrimitives
+from multiprocessing import Process, Queue
 
 # def add(a, b):
 #     return a + b
@@ -22,12 +23,16 @@ class JunkBoxServer:
         self.is_running = False
         self.clients = dict()
         self.math_primatives = MathPrimitives()
+        # create a multiprocessing interface for a shell to interact with the job queue
+
 
     def start(self):
         """Starts the server"""
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
+            # run the sockets on one process and then start another to allow interaction with the job queue
+
             self.server_socket.bind((self.host, self.port))
 
             self.server_socket.listen(5)
