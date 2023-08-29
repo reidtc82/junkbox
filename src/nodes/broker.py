@@ -3,14 +3,13 @@ import socket
 import sys
 import threading
 import time
+
+from src.utility.math import MathPrimitives
+from multiprocessing import Process, Queue
+
 import json
 
 import dill as pickle
-<<<<<<< HEAD
-from src.utility.math import MathPrimitives
-from multiprocessing import Process, Queue
-=======
->>>>>>> queuing
 
 from src.utility.junk import Job, WorkRequest, WorkReturn
 from src.utility.math import MathPrimitives
@@ -28,12 +27,8 @@ class JunkBoxServer:
         self.is_running = False
         self.clients = dict()
         self.math_primatives = MathPrimitives()
-<<<<<<< HEAD
-        # create a multiprocessing interface for a shell to interact with the job queue
-
-=======
         self.jobs = []
->>>>>>> queuing
+
 
     def start(self):
         """Starts the server"""
@@ -80,21 +75,13 @@ class JunkBoxServer:
 
             if client_socket.fileno() != -1:  # -1 means an error occurred
                 if data["header"] == "work_request":
-<<<<<<< HEAD
-                    time.sleep(random.randint(1, 5))
-                    response = {
-                        "header": "job",
-                        "operation": self.math_primatives.add(),
-                        "args": [random.randint(1, 10), random.randint(1, 10)],
-                    }
-=======
+
                     while len(self.jobs) == 0:
                         print("No jobs...")
                         time.sleep(1)
 
                     time.sleep(random.randint(1, 5))
                     response = self.pop_job().to_dict()
->>>>>>> queuing
 
                 elif data["header"] == "work_return":
                     print("Received result:", data["body"])
@@ -156,7 +143,7 @@ if __name__ == "__main__":
         ]
     )
     server.start()
-    
+
 
 # To stop the server (you can call this from another part of your code)
 # server.stop()
