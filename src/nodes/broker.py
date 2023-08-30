@@ -5,7 +5,7 @@ import threading
 import time
 
 from src.utility.math import MathPrimitives
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Pool
 
 import json
 
@@ -83,8 +83,13 @@ class JunkBoxServer:
             if client_socket.fileno() != -1:  # -1 means an error occurred
                 if data["header"] == "work_request":
                     while self.jobs.empty():
-                        print("No jobs...")
-                        time.sleep(1)
+                        try:
+                            print("No jobs...")
+                            time.sleep(1)
+                        except KeyboardInterrupt:
+                            print("Server shutdown initiated by keyboard interrupt...")
+                            self.stop()
+                            sys.exit(1)
 
                     time.sleep(random.randint(1, 5))
                     response = self.pop_job()
@@ -107,9 +112,6 @@ class JunkBoxServer:
             self.server_socket.close()
             self.server_socket = None
             print("Server stopped.")
-
-        for p in self.processes:
-            p.join()
 
     def set_job(self, job: Job):
         print("Adding job:", job)
