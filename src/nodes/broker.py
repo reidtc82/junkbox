@@ -70,7 +70,7 @@ class JunkBoxServer:
     def handle_client(self, client_socket, client_address):
         """Handles a client connection"""
         print("Connected to:", client_address)
-        self.clients[client_address] = client_socket
+        self.clients[client_address] = {}
 
         while True:
             data = client_socket.recv(1024)
@@ -92,15 +92,17 @@ class JunkBoxServer:
                             sys.exit(1)
 
                     time.sleep(random.randint(1, 5))
-                    response = self.pop_job()
+                    packet = self.pop_job()
+                    self.clients[client_address]["job_id"] = pickle.loads(packet)["id"]
 
                 elif data["header"] == "work_return":
                     print("Received result:", data["body"])
-                    response = pickle.dumps(
+                    self.clients[client_address][data['id']] = data["body"]
+                    packet = pickle.dumps(
                         {"header": "message", "text": "Result received."}
                     )
 
-                client_socket.sendall(response)
+                client_socket.sendall(packet)
 
         client_socket.close()
         print("Disconnected from:", client_address)
@@ -112,6 +114,9 @@ class JunkBoxServer:
             self.server_socket.close()
             self.server_socket = None
             print("Server stopped.")
+            
+            for key, value in self.clients:
+                print("Client:", key, "Result:", value)
 
     def set_job(self, job: Job):
         print("Adding job:", job)

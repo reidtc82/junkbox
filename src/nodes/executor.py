@@ -31,9 +31,9 @@ class MySocketClient:
         # response = eval(response)
         return response
 
-    def return_work(self, res):
+    def return_work(self, id, res):
         # Send a message to the server
-        message = {"header": "work_return", "body": res}
+        message = {"header": "work_return", "body": res, "job_id": id}
         self.client_socket.sendall(pickle.dumps(message))
 
         # Receive the response from the server
@@ -72,7 +72,7 @@ if __name__ == "__main__":
                         + "\t\t",
                         result,
                     )
-                    client.return_work(result)
+                    client.return_work(job["id"], result)
                 except KeyboardInterrupt:
                     print("Client shutdown initiated by keyboard interrupt...")
                     client.close()

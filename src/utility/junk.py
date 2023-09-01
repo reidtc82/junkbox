@@ -1,3 +1,6 @@
+import uuid
+
+
 class Junk:
     """_summary_ : A class that represents a junk message."""
 
@@ -67,10 +70,12 @@ class Job(Junk):
 
     operation = None
     args = None
+    id = None
 
     def __init__(self, operation=None, args=None):
         self.operation = operation
         self.args = args
+        self.id = uuid.uuid4()
         super().__init__("job")
 
     def to_dict(self):
