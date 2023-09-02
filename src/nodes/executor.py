@@ -1,6 +1,7 @@
 import socket
 import sys
 import dill as pickle
+from src.utility.junk import WorkReturn
 
 
 class MySocketClient:
@@ -33,7 +34,7 @@ class MySocketClient:
 
     def return_work(self, id, res):
         # Send a message to the server
-        message = {"header": "work_return", "body": res, "job_id": id}
+        message = WorkReturn(body=res, id=id).to_dict()
         self.client_socket.sendall(pickle.dumps(message))
 
         # Receive the response from the server

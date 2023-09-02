@@ -1,6 +1,3 @@
-import uuid
-
-
 class Junk:
     """_summary_ : A class that represents a junk message."""
 
@@ -47,9 +44,11 @@ class WorkReturn(Junk):
     """
 
     body = None
+    id = None
 
-    def __init__(self, body=None):
+    def __init__(self, body=None, id=None):
         self.body = body
+        self.id = id
         super().__init__("work_return")
 
     def to_dict(self):
@@ -58,7 +57,7 @@ class WorkReturn(Junk):
         Returns:
             _type_: _description_
         """
-        return {"header": self.header, "body": self.body}
+        return {"header": self.header, "body": self.body, "id": self.id}
 
 
 class Job(Junk):
@@ -72,10 +71,10 @@ class Job(Junk):
     args = None
     id = None
 
-    def __init__(self, operation=None, args=None):
+    def __init__(self, operation=None, args=None, id=None):
         self.operation = operation
         self.args = args
-        self.id = uuid.uuid4()
+        self.id = id
         super().__init__("job")
 
     def to_dict(self):
@@ -84,4 +83,9 @@ class Job(Junk):
         Returns:
             _type_: _description_
         """
-        return {"header": self.header, "operation": self.operation, "args": self.args}
+        return {
+            "header": self.header,
+            "operation": self.operation,
+            "args": self.args,
+            "id": self.id,
+        }

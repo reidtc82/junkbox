@@ -3,6 +3,7 @@ import socket
 import sys
 import threading
 import time
+import uuid
 
 from src.utility.math import MathPrimitives
 from multiprocessing import Process, Queue, Pool
@@ -93,11 +94,12 @@ class JunkBoxServer:
 
                     time.sleep(random.randint(1, 5))
                     packet = self.pop_job()
-                    self.clients[client_address]["job_id"] = pickle.loads(packet)["id"]
+                    job_id = pickle.loads(packet)["id"]
+                    self.clients[client_address]["job_id"] = job_id
 
                 elif data["header"] == "work_return":
-                    print("Received result:", data["body"])
-                    self.clients[client_address][data['id']] = data["body"]
+                    print("Received result:", data["body"], "from job:", data["id"])
+                    self.clients[client_address][data["id"]] = data["body"]
                     packet = pickle.dumps(
                         {"header": "message", "text": "Result received."}
                     )
@@ -114,7 +116,7 @@ class JunkBoxServer:
             self.server_socket.close()
             self.server_socket = None
             print("Server stopped.")
-            
+
             for key, value in self.clients:
                 print("Client:", key, "Result:", value)
 
@@ -135,6 +137,10 @@ class JunkBoxServer:
 
     def pop_job(self):
         return self.jobs.get()
+    
+    def print_queue(self):
+        print("*************************************")
+        print(self.clients)
 
 
 if __name__ == "__main__":
@@ -145,41 +151,50 @@ if __name__ == "__main__":
             Job(
                 operation=maths.add(),
                 args=[random.randint(1, 10), random.randint(1, 10)],
+                id=uuid.uuid4(),
             ),
             Job(
                 operation=maths.subtract(),
                 args=[random.randint(1, 10), random.randint(1, 10)],
+                id=uuid.uuid4(),
             ),
             Job(
                 operation=maths.multiply(),
                 args=[random.randint(1, 10), random.randint(1, 10)],
+                id=uuid.uuid4(),
             ),
             Job(
                 operation=maths.divide(),
                 args=[random.randint(1, 10), random.randint(1, 10)],
+                id=uuid.uuid4(),
             ),
         ]
     )
     server.start()
     while True:
         time.sleep(random.randint(10, 30))
+        server.print_queue()
         server.set_jobs(
             [
                 Job(
                     operation=maths.add(),
                     args=[random.randint(1, 10), random.randint(1, 10)],
+                    id=uuid.uuid4(),
                 ),
                 Job(
                     operation=maths.subtract(),
                     args=[random.randint(1, 10), random.randint(1, 10)],
+                    id=uuid.uuid4(),
                 ),
                 Job(
                     operation=maths.multiply(),
                     args=[random.randint(1, 10), random.randint(1, 10)],
+                    id=uuid.uuid4(),
                 ),
                 Job(
                     operation=maths.divide(),
                     args=[random.randint(1, 10), random.randint(1, 10)],
+                    id=uuid.uuid4(),
                 ),
             ]
         )
